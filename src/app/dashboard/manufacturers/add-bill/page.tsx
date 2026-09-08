@@ -847,7 +847,7 @@ export default function AddManufacturerBillPage() {
                       <td className="p-2.5 text-right font-mono">{it.netWt}</td>
                       <td className="p-2.5 text-right font-mono">{it.touch}</td>
                       <td className="p-2.5 text-right font-mono">{it.w}</td>
-                      <td className="p-2.5 text-right font-mono font-semibold text-amber-800">{it.fine || it.silverFine}</td>
+                      <td className="p-2.5 text-right font-mono font-semibold text-amber-800">{it.fine || (it as any).silverFine}</td>
                       <td className="p-2.5 text-right font-mono">{it.wt1000pcs}</td>
                       <td className="p-2.5 text-right font-mono">{it.rate}</td>
                       <td className="p-2.5 text-right font-mono">₹{it.amount}</td>
