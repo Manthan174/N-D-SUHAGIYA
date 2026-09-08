@@ -1,0 +1,465 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   CORE VARIABLES
+   ============================================ */
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-dark: #9A7230;
+  --cream: #FDF8EE;
+  --cream-deep: #F5EDD8;
+  --ink: #1C1409;
+  --ink-soft: #3D2E0F;
+  --stone: #78716c;
+}
+
+body {
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  background: #fff;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================
+   TYPOGRAPHY HELPERS
+   ============================================ */
+.font-display {
+  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+}
+
+.font-ui {
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
+
+/* ============================================
+   SCROLL REVEAL
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.75s cubic-bezier(.25, .46, .45, .94),
+    transform 0.75s cubic-bezier(.25, .46, .45, .94);
+  will-change: transform, opacity;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-l {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.75s cubic-bezier(.25, .46, .45, .94),
+    transform 0.75s cubic-bezier(.25, .46, .45, .94);
+  will-change: transform, opacity;
+}
+
+.reveal-l.in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-r {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.75s cubic-bezier(.25, .46, .45, .94),
+    transform 0.75s cubic-bezier(.25, .46, .45, .94);
+  will-change: transform, opacity;
+}
+
+.reveal-r.in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.d1 {
+  transition-delay: .10s;
+}
+
+.d2 {
+  transition-delay: .18s;
+}
+
+.d3 {
+  transition-delay: .26s;
+}
+
+.d4 {
+  transition-delay: .34s;
+}
+
+.d5 {
+  transition-delay: .42s;
+}
+
+.d6 {
+  transition-delay: .50s;
+}
+
+.d7 {
+  transition-delay: .58s;
+}
+
+.d8 {
+  transition-delay: .66s;
+}
+
+/* ============================================
+   GOLD SHIMMER BUTTON
+   ============================================ */
+@keyframes shimmer-btn {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(110deg, #C9A84C 0%, #E8C96A 35%, #C9A84C 55%, #9A7230 80%, #C9A84C 100%);
+  background-size: 250% auto;
+  animation: shimmer-btn 4s linear infinite;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
+  border-radius: 9999px;
+  transition: box-shadow .25s, transform .2s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(201, 168, 76, .45);
+}
+
+.btn-outline {
+  border: 1.5px solid rgba(201, 168, 76, .45);
+  color: var(--gold-dark);
+  background: rgba(201, 168, 76, .06);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all .2s;
+}
+
+.btn-outline:hover {
+  border-color: var(--gold);
+  background: rgba(201, 168, 76, .12);
+  color: var(--gold-dark);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   GOLD TEXT GRADIENT
+   ============================================ */
+.gold-text {
+  background: linear-gradient(135deg, #C9A84C 0%, #E8C96A 50%, #9A7230 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-text-light {
+  background: linear-gradient(135deg, #F0D060 0%, #FDEEA0 50%, #E8C96A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   LABEL BADGE
+   ============================================ */
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+.eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .35rem .9rem;
+  border-radius: 9999px;
+  background: rgba(201, 168, 76, .1);
+  border: 1px solid rgba(201, 168, 76, .25);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .65rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+/* ============================================
+   SECTION DIVIDER
+   ============================================ */
+.divider-gold {
+  width: 56px;
+  height: 3px;
+  background: linear-gradient(90deg, #C9A84C, #E8C96A, #C9A84C);
+  border-radius: 9999px;
+  margin: 1rem auto 0;
+}
+
+/* ============================================
+   FEATURE CARD
+   ============================================ */
+.f-card {
+  background: #fff;
+  border: 1px solid rgba(201, 168, 76, .12);
+  border-radius: 20px;
+  padding: 1.75rem;
+  transition: transform .35s cubic-bezier(.175, .885, .32, 1.275),
+    box-shadow .35s ease,
+    border-color .35s;
+}
+
+.f-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(201, 168, 76, .14), 0 6px 16px rgba(0, 0, 0, .06);
+  border-color: rgba(201, 168, 76, .35);
+}
+
+/* ============================================
+   DASHBOARD GLASS CARD
+   ============================================ */
+.d-card {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(201, 168, 76, .18);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  transition: background .25s, border-color .25s;
+}
+
+.d-card:hover {
+  background: rgba(255, 255, 255, .10);
+  border-color: rgba(201, 168, 76, .32);
+}
+
+/* ============================================
+   HERO BACKGROUND
+   ============================================ */
+.hero-bg {
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 50%, rgba(201, 168, 76, .09) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 85% 25%, rgba(37, 99, 235, .05) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 55% at 65% 80%, rgba(16, 185, 129, .04) 0%, transparent 60%),
+    #100E09;
+}
+
+/* ============================================
+   PARTICLES
+   ============================================ */
+@keyframes rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+
+  8% {
+    opacity: .9;
+  }
+
+  92% {
+    opacity: .5;
+  }
+
+  100% {
+    transform: translateY(-110vh) translateX(var(--dx, 30px)) scale(.3);
+    opacity: 0;
+  }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #E8C96A, #C9A84C);
+  animation: rise linear infinite;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* ============================================
+   FLOAT
+   ============================================ */
+@keyframes float-y {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float-y 4s ease-in-out infinite;
+}
+
+.float2 {
+  animation: float-y 4.5s ease-in-out .9s infinite;
+}
+
+.float3 {
+  animation: float-y 5s ease-in-out .4s infinite;
+}
+
+/* ============================================
+   SPIN SLOW
+   ============================================ */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-slow {
+  animation: spin-slow 22s linear infinite;
+}
+
+.spin-slow-r {
+  animation: spin-slow 28s linear infinite reverse;
+}
+
+/* ============================================
+   MARQUEE
+   ============================================ */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid rgba(201, 168, 76, .08);
+}
+
+.compare-row:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   TESTIMONIAL CARD
+   ============================================ */
+.t-card {
+  background: #FFFDF6;
+  border: 1px solid rgba(201, 168, 76, .15);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.t-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(201, 168, 76, .12);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #100E09;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#C9A84C, #9A7230);
+  border-radius: 99px;
+}
+
+/* ============================================
+   MISC
+   ============================================ */
+.section-light {
+  background: #FFFDF6;
+}
+
+.section-cream {
+  background: linear-gradient(180deg, #FDF8EE 0%, #FBF2E0 100%);
+}
+
+.section-dark {
+  background: #100E09;
+}
+
+.section-dark2 {
+  background: linear-gradient(135deg, #1A1200 0%, #261A00 50%, #1A1200 100%);
+}
+
+@keyframes pulse-gold {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 168, 76, .5);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(201, 168, 76, 0);
+  }
+}
+
+.pulse-gold {
+  animation: pulse-gold 2.5s ease-in-out infinite;
+}
+
+/* ============================================
+   AUTH PAGES
+   ============================================ */
+@keyframes animate-pulse-zoom {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.06);
+    opacity: .9;
+  }
+}
+
+.animate-pulse-zoom {
+  animation: animate-pulse-zoom 2s ease-in-out infinite;
+}
+
+/* Input focus glow for auth forms */
+input:focus {
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, .15);
+}
