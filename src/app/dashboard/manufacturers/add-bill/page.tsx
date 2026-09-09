@@ -279,7 +279,7 @@ export default function AddManufacturerBillPage() {
           }
 
           if (net > 0 && r > 0) {
-            updated.amount = ((net / 1000) * r).toFixed(2);
+            updated.amount = parseFloat(((net / 1000) * r).toFixed(2)).toString();
           } else if (updated.netWt === "" || updated.rate === "") {
             updated.amount = "";
           }
@@ -327,7 +327,7 @@ export default function AddManufacturerBillPage() {
 
   const labourVal = parseFloat(labourCharges) || 0;
   const discountVal = parseFloat(discount) || 0;
-  const calculatedNetAmount = Math.max(0, calculatedGrossAmount + labourVal - discountVal).toFixed(2);
+  const calculatedNetAmount = parseFloat(Math.max(0, calculatedGrossAmount + labourVal - discountVal).toFixed(2)).toString();
 
   // Reset Form
   const resetForm = () => {
@@ -374,13 +374,13 @@ export default function AddManufacturerBillPage() {
         fine: i.fine || "0.000",
         wt1000pcs: i.wt1000pcs || "0",
         rate: i.rate || "0",
-        amount: i.amount || "0.00"
+        amount: i.amount || "0"
       })),
       totalWeight: calculatedTotalWeight,
       totalSilverFine: calculatedTotalSilverFine,
-      grossAmount: calculatedGrossAmount.toFixed(2),
-      labourCharges: labourCharges || "0.00",
-      discount: discount || "0.00",
+      grossAmount: parseFloat(calculatedGrossAmount.toFixed(2)).toString(),
+      labourCharges: labourCharges || "0",
+      discount: discount || "0",
       netAmount: calculatedNetAmount,
       paymentStatus,
       remarks: remarks.trim()
@@ -413,8 +413,8 @@ export default function AddManufacturerBillPage() {
     setItems(bill.items && bill.items.length > 0 ? bill.items : [
       { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "", wt1000pcs: "", rate: "", amount: "" }
     ]);
-    setLabourCharges(bill.labourCharges === "0.00" ? "" : bill.labourCharges);
-    setDiscount(bill.discount === "0.00" ? "" : bill.discount);
+    setLabourCharges((bill.labourCharges === "0.00" || bill.labourCharges === "0") ? "" : bill.labourCharges);
+    setDiscount((bill.discount === "0.00" || bill.discount === "0") ? "" : bill.discount);
     setPaymentStatus(bill.paymentStatus || "Unpaid");
     setRemarks(bill.remarks || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -898,7 +898,7 @@ export default function AddManufacturerBillPage() {
                     <td className="p-3 font-semibold text-stone-900">{b.manufacturerName}</td>
                     <td className="p-3 text-right font-mono text-stone-800">{b.totalSilverFine} g</td>
                     <td className="p-3 text-right font-mono font-bold text-stone-900">
-                      ₹{parseFloat(b.netAmount || "0").toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      ₹{parseFloat(b.netAmount || "0").toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                     </td>
                     <td className="p-3 text-center">
                       <span
