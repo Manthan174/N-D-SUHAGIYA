@@ -175,7 +175,7 @@ export default function AddManufacturerBillPage() {
   const [billNo, setBillNo] = useState("");
   const [billDate, setBillDate] = useState(new Date().toISOString().split("T")[0]);
   const [items, setItems] = useState<BillItem[]>([
-    { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "0.000", wt1000pcs: "", rate: "", amount: "" }
+    { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "", wt1000pcs: "", rate: "", amount: "" }
   ]);
   const [labourCharges, setLabourCharges] = useState("");
   const [discount, setDiscount] = useState("");
@@ -183,6 +183,11 @@ export default function AddManufacturerBillPage() {
   const [remarks, setRemarks] = useState("");
   const [previousAmount, setPreviousAmount] = useState("");
   const [previousSilver, setPreviousSilver] = useState("");
+
+  const [mfrCompany, setMfrCompany] = useState("");
+  const [mfrMobile, setMfrMobile] = useState("");
+  const [mfrAddress, setMfrAddress] = useState("");
+  const [itemLanguage, setItemLanguage] = useState<"english" | "gujarati">("english");
 
   // Search & Filter state for History
   const [searchQuery, setSearchQuery] = useState("");
@@ -214,6 +219,9 @@ export default function AddManufacturerBillPage() {
   // Auto-fill outstanding balances for selected manufacturer
   useEffect(() => {
     if (!selectedManufacturer) {
+      setMfrCompany("");
+      setMfrMobile("");
+      setMfrAddress("");
       setPreviousAmount("");
       setPreviousSilver("");
       return;
@@ -221,6 +229,12 @@ export default function AddManufacturerBillPage() {
 
     // 1. Get initial balance
     const mfr = manufacturers.find((m) => m.name === selectedManufacturer);
+    if (mfr) {
+      setMfrCompany(mfr.companyName || "");
+      setMfrMobile(mfr.mobile || "");
+      setMfrAddress(mfr.address || "");
+    }
+    
     let outAmount = parseFloat(mfr?.payAmount || "0");
     let outSilver = parseFloat(mfr?.payFine || "0");
 
@@ -252,6 +266,25 @@ export default function AddManufacturerBillPage() {
         if (item.id !== id) return item;
         const updated = { ...item, [field]: val };
 
+        // Auto-calculate fine and amount when netWt, touch, or rate changes
+        if (field === "netWt" || field === "touch" || field === "rate") {
+          const net = parseFloat(updated.netWt) || 0;
+          const t = parseFloat(updated.touch) || 100;
+          const r = parseFloat(updated.rate) || 0;
+
+          if (net > 0) {
+            updated.fine = (net * (t / 100)).toFixed(3);
+          } else if (updated.netWt === "") {
+            updated.fine = "";
+          }
+
+          if (net > 0 && r > 0) {
+            updated.amount = ((net / 1000) * r).toFixed(2);
+          } else if (updated.netWt === "" || updated.rate === "") {
+            updated.amount = "";
+          }
+        }
+
         return updated;
       })
     );
@@ -267,7 +300,7 @@ export default function AddManufacturerBillPage() {
         netWt: "",
         touch: "100",
         w: "",
-        fine: "0.000",
+        fine: "",
         wt1000pcs: "",
         rate: "",
         amount: ""
@@ -303,7 +336,7 @@ export default function AddManufacturerBillPage() {
     setBillNo("");
     setBillDate(new Date().toISOString().split("T")[0]);
     setItems([
-      { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "0.000", wt1000pcs: "", rate: "", amount: "" }
+      { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "", wt1000pcs: "", rate: "", amount: "" }
     ]);
     setLabourCharges("");
     setDiscount("");
@@ -378,7 +411,7 @@ export default function AddManufacturerBillPage() {
     setBillNo(bill.billNo);
     setBillDate(bill.date);
     setItems(bill.items && bill.items.length > 0 ? bill.items : [
-      { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "0.000", wt1000pcs: "", rate: "", amount: "" }
+      { id: "1", description: "", gross: "", netWt: "", touch: "100", w: "", fine: "", wt1000pcs: "", rate: "", amount: "" }
     ]);
     setLabourCharges(bill.labourCharges === "0.00" ? "" : bill.labourCharges);
     setDiscount(bill.discount === "0.00" ? "" : bill.discount);
@@ -406,6 +439,30 @@ export default function AddManufacturerBillPage() {
       b.billNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.date.includes(searchQuery)
   );
+
+  const tH = itemLanguage === "gujarati" ? {
+    Description: "વિગત",
+    Gross: "ગ્રોસ (g)",
+    NetWt: "નેટ વજન (g)",
+    Touch: "ટચ",
+    W: "ઘટ",
+    Fine: "ફાઇન",
+    Wt1000pcs: "૧૦૦૦ નંગનું વજન",
+    Rate: "ભાવ/કિલો",
+    Amount: "રકમ",
+    Action: "ક્રિયા"
+  } : {
+    Description: "Description",
+    Gross: "Gross (g)",
+    NetWt: "Net Wt (g)",
+    Touch: "Touch",
+    W: "W",
+    Fine: "Fine",
+    Wt1000pcs: "Wt/1000 pcs",
+    Rate: "Rate (/kg)",
+    Amount: "Amt",
+    Action: "Action"
+  };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -461,7 +518,7 @@ export default function AddManufacturerBillPage() {
             Manufacturer & Invoice Info
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Manufacturer Selector */}
             <div>
               <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">
@@ -472,6 +529,36 @@ export default function AddManufacturerBillPage() {
                 value={selectedManufacturer}
                 onChange={setSelectedManufacturer}
                 placeholder="Select Manufacturer"
+              />
+            </div>
+
+            {/* Company Name */}
+            <div>
+              <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">
+                Company
+              </label>
+              <input
+                type="text"
+                value={mfrCompany}
+                onChange={(e) => setMfrCompany(e.target.value)}
+                readOnly
+                className="w-full px-4 py-3 text-sm bg-stone-100 border border-stone-200 rounded-xl text-stone-500 cursor-not-allowed font-medium"
+                placeholder="Company Name"
+              />
+            </div>
+
+            {/* Mobile Number */}
+            <div>
+              <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">
+                Mobile
+              </label>
+              <input
+                type="text"
+                value={mfrMobile}
+                onChange={(e) => setMfrMobile(e.target.value)}
+                readOnly
+                className="w-full px-4 py-3 text-sm bg-stone-100 border border-stone-200 rounded-xl text-stone-500 cursor-not-allowed font-medium"
+                placeholder="Mobile Number"
               />
             </div>
 
@@ -505,45 +592,48 @@ export default function AddManufacturerBillPage() {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Selected Manufacturer Details Preview */}
-          {currentMfr && (
-            <div className="p-4 bg-amber-50/60 border border-amber-200/70 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center gap-2 text-stone-700">
-                <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="font-semibold">{currentMfr.companyName || currentMfr.name}</span>
-              </div>
-              {currentMfr.mobile && (
-                <div className="flex items-center gap-2 text-stone-700">
-                  <Phone className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>{currentMfr.mobile}</span>
-                </div>
-              )}
-              {currentMfr.address && (
-                <div className="flex items-center gap-2 text-stone-700">
-                  <MapPin className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span className="truncate">{currentMfr.address}</span>
-                </div>
-              )}
+            
+            {/* Address (Full width below) */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-5">
+              <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">
+                Address
+              </label>
+              <input
+                type="text"
+                value={mfrAddress}
+                onChange={(e) => setMfrAddress(e.target.value)}
+                readOnly
+                className="w-full px-4 py-3 text-sm bg-stone-100 border border-stone-200 rounded-xl text-stone-500 cursor-not-allowed font-medium"
+                placeholder="Full Address"
+              />
             </div>
-          )}
+          </div>
         </div>
 
         {/* Bill Items Section */}
         <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
               <FileText className="w-5 h-5 text-amber-500" />
               Bill Items
             </h2>
-            <button
-              type="button"
-              onClick={addItemRow}
-              className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-colors"
-            >
-              <Plus className="w-4 h-4" /> Add Item
-            </button>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="itemLanguage" value="english" checked={itemLanguage === "english"} onChange={() => setItemLanguage("english")} className="text-amber-500 focus:ring-amber-500" />
+                <span className="text-sm font-medium text-stone-700">English</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer mr-2">
+                <input type="radio" name="itemLanguage" value="gujarati" checked={itemLanguage === "gujarati"} onChange={() => setItemLanguage("gujarati")} className="text-amber-500 focus:ring-amber-500" />
+                <span className="text-sm font-medium text-stone-700">Gujarati</span>
+              </label>
+              <button
+                type="button"
+                onClick={addItemRow}
+                className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Add Item
+              </button>
+            </div>
           </div>
 
           {/* Items Table */}
@@ -552,16 +642,16 @@ export default function AddManufacturerBillPage() {
               <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-semibold text-xs uppercase tracking-wider">
                 <tr>
                   <th className="p-3 w-12 text-center">#</th>
-                  <th className="p-3 min-w-[150px]">Description</th>
-                  <th className="p-3 w-24">Gross</th>
-                  <th className="p-3 w-24">Net Wt</th>
-                  <th className="p-3 w-24">Touch</th>
-                  <th className="p-3 w-20">W</th>
-                  <th className="p-3 w-28">Fine</th>
-                  <th className="p-3 w-28">Wt/1000 pcs</th>
-                  <th className="p-3 w-24">Rate (/kg)</th>
-                  <th className="p-3 w-28">Amt</th>
-                  <th className="p-3 w-12 text-center">Action</th>
+                  <th className="p-3 min-w-[150px]">{tH.Description}</th>
+                  <th className="p-3 w-24">{tH.Gross}</th>
+                  <th className="p-3 w-24">{tH.NetWt}</th>
+                  <th className="p-3 w-24">{tH.Touch}</th>
+                  <th className="p-3 w-20">{tH.W}</th>
+                  <th className="p-3 w-28">{tH.Fine}</th>
+                  <th className="p-3 w-28">{tH.Wt1000pcs}</th>
+                  <th className="p-3 w-24">{tH.Rate}</th>
+                  <th className="p-3 w-28">{tH.Amount}</th>
+                  <th className="p-3 w-12 text-center">{tH.Action}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 bg-white">

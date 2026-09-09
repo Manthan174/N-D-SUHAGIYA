@@ -1154,14 +1154,11 @@ export default function CreateBillPage() {
                   <span className="text-sm font-medium text-stone-700">Gujarati</span>
                 </label>
                 <button
-                  onClick={() => {
-                    setIsManageModalOpen(true);
-                    setManageModalView("bill");
-                  }}
+                  onClick={handleAddItem}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200"
                 >
                   <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Add Items</span>
+                  <span className="hidden sm:inline">Add Item</span>
                   <span className="sm:hidden">Add</span>
                 </button>
               </div>
@@ -1230,21 +1227,17 @@ export default function CreateBillPage() {
                       Round off (Orig: {originalSilver})
                     </div>
                   )}
-                  <input id="inputSilver" type="number" value={inputSilver} onChange={e => { setInputSilver(e.target.value); setOriginalSilver(""); }} onKeyDown={(e) => focusNext(e, 'btnAddItem')} placeholder="0" className="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white" />
+                  <input id="inputSilver" type="number" value={inputSilver} onChange={e => { setInputSilver(e.target.value); setOriginalSilver(""); }} onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddItem();
+                    }
+                  }} placeholder="0" className="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white" />
                 </div>
-                <div className="col-span-2 sm:col-span-1 md:col-span-1 lg:col-span-1 mt-2 lg:mt-0 flex gap-2 w-full lg:w-auto shrink-0">
-                  <button
-                    id="btnAddItem"
-                    onClick={handleAddItem}
-                    className="h-[38px] flex-1 lg:flex-none lg:px-3.5 inline-flex items-center justify-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-semibold transition-colors"
-                    title="Add Item"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="font-medium">Add Item</span>
-                  </button>
+                <div className="col-span-2 sm:col-span-1 md:col-span-1 lg:col-span-1 mt-2 lg:mt-0 flex justify-end w-full lg:w-auto shrink-0">
                   <button
                     onClick={clearItemInputs}
-                    className="h-[38px] flex-[0.3] lg:w-10 flex items-center justify-center bg-stone-200 hover:bg-stone-300 text-stone-600 rounded-lg transition-colors"
+                    className="h-[38px] w-10 flex items-center justify-center bg-stone-200 hover:bg-stone-300 text-stone-600 rounded-lg transition-colors"
                     title="Clear Inputs"
                   >
                     <X className="h-5 w-5" />
