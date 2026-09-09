@@ -245,17 +245,40 @@ export default function ManufacturerPayAmountPage() {
     // Keep Manufacturer, Date, and Mode for quick consecutive entries
   };
 
-  // Compute Overall Totals
-  const initialTotalAmount = manufacturersData.reduce((acc, m) => acc + parseFloat(m.payAmount || "0"), 0);
-  const initialTotalFine = manufacturersData.reduce((acc, m) => acc + parseFloat(m.payFine || "0"), 0);
-  const billsTotalAmount = billsHistory.reduce((acc, b) => acc + parseFloat(b.netAmount || b.grossAmount || "0"), 0);
-  const billsTotalFine = billsHistory.reduce((acc, b) => acc + parseFloat(b.totalSilverFine || "0"), 0);
+  // Compute Totals for Summary Cards
+  let totalAmount = 0;
+  let totalFine = 0;
+  let paidAmount = 0;
+  let paidFine = 0;
 
-  const totalAmount = initialTotalAmount + billsTotalAmount;
-  const totalFine = initialTotalFine + billsTotalFine;
+  const mfrsToCompute = formManufacturerName 
+    ? manufacturersData.filter(m => m.name === formManufacturerName)
+    : manufacturersData;
 
-  const paidAmount = history.reduce((acc, p) => acc + (parseFloat(p.amount || "0") + parseFloat(p.notPayableAmount || "0")), 0);
-  const paidFine = history.reduce((acc, p) => acc + parseFloat(p.silverKg || "0"), 0);
+  mfrsToCompute.forEach(mfr => {
+    let mTotalAmt = parseFloat(mfr.payAmount || "0");
+    let mTotalFine = parseFloat(mfr.payFine || "0");
+
+    const mfrBills = billsHistory.filter(b => b.manufacturerName === mfr.name);
+    mfrBills.forEach(bill => {
+      mTotalAmt += parseFloat(bill.netAmount || bill.grossAmount || "0");
+      mTotalFine += parseFloat(bill.totalSilverFine || "0");
+    });
+
+    const mfrPayments = history.filter(h => h.manufacturerName === mfr.name);
+    let mPaidAmt = 0;
+    let mPaidFine = 0;
+    mfrPayments.forEach(pay => {
+      mPaidAmt += (parseFloat(pay.amount || "0") + parseFloat(pay.notPayableAmount || "0"));
+      mPaidFine += parseFloat(pay.silverKg || "0");
+    });
+
+    totalAmount += mTotalAmt;
+    totalFine += mTotalFine;
+    paidAmount += mPaidAmt;
+    paidFine += mPaidFine;
+  });
+
   const dueAmount = totalAmount - paidAmount;
   const dueFine = totalFine - paidFine;
 

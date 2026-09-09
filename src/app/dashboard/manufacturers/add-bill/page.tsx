@@ -27,6 +27,7 @@ import {
 import {
   subscribeToManufacturers,
   subscribeToManufacturerBills,
+  subscribeToManufacturerPayments,
   addManufacturerBillToDB,
   updateManufacturerBillInDB,
   deleteManufacturerBillFromDB
@@ -164,6 +165,7 @@ export default function AddManufacturerBillPage() {
   // Data states
   const [manufacturers, setManufacturers] = useState<any[]>([]);
   const [bills, setBills] = useState<ManufacturerBillRecord[]>([]);
+  const [paymentsHistory, setPaymentsHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -179,6 +181,8 @@ export default function AddManufacturerBillPage() {
   const [discount, setDiscount] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<"Unpaid" | "Partial" | "Paid">("Unpaid");
   const [remarks, setRemarks] = useState("");
+  const [previousAmount, setPreviousAmount] = useState("");
+  const [previousSilver, setPreviousSilver] = useState("");
 
   // Search & Filter state for History
   const [searchQuery, setSearchQuery] = useState("");
@@ -196,11 +200,47 @@ export default function AddManufacturerBillPage() {
       setLoading(false);
     });
 
+    const unsubPayments = subscribeToManufacturerPayments((data) => {
+      setPaymentsHistory(data);
+    });
+
     return () => {
       unsubMfrs();
       unsubBills();
+      unsubPayments();
     };
   }, []);
+
+  // Auto-fill outstanding balances for selected manufacturer
+  useEffect(() => {
+    if (!selectedManufacturer) {
+      setPreviousAmount("");
+      setPreviousSilver("");
+      return;
+    }
+
+    // 1. Get initial balance
+    const mfr = manufacturers.find((m) => m.name === selectedManufacturer);
+    let outAmount = parseFloat(mfr?.payAmount || "0");
+    let outSilver = parseFloat(mfr?.payFine || "0");
+
+    // 2. Add all bill amounts
+    const mfrBills = bills.filter(b => b.manufacturerName === selectedManufacturer);
+    mfrBills.forEach(bill => {
+      outAmount += parseFloat(bill.netAmount || bill.grossAmount || "0");
+      outSilver += parseFloat(bill.totalSilverFine || "0");
+    });
+
+    // 3. Subtract all paid amounts
+    const mfrPayments = paymentsHistory.filter(h => h.manufacturerName === selectedManufacturer);
+    mfrPayments.forEach(pay => {
+      outAmount -= (parseFloat(pay.amount || "0") + parseFloat(pay.notPayableAmount || "0"));
+      outSilver -= parseFloat(pay.silverKg || "0");
+    });
+
+    setPreviousAmount(Math.round(outAmount).toString());
+    setPreviousSilver(Number(outSilver.toFixed(3)).toString());
+  }, [selectedManufacturer, manufacturers, bills, paymentsHistory]);
 
   // Selected manufacturer detail
   const currentMfr = manufacturers.find((m) => m.name === selectedManufacturer);
@@ -373,7 +413,7 @@ export default function AddManufacturerBillPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-5">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 flex items-center gap-3">
-            <Receipt className="w-8 h-8 text-amber-500" />
+            <IndianRupee className="w-8 h-8 text-amber-500" />
             Add Manufacturer Bill
           </h1>
           <p className="text-sm text-stone-500 mt-1">
@@ -633,6 +673,39 @@ export default function AddManufacturerBillPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Outstanding Balances inside Items card */}
+          <div className="mt-8 pt-6 border-t border-stone-200">
+            <h3 className="text-sm font-bold text-stone-900 mb-4">Outstanding Balances</h3>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div>
+                <label className="block text-xs font-semibold text-stone-500 mb-2 uppercase tracking-wider">
+                  Amount (₹)
+                </label>
+                <input
+                  type="number"
+                  value={previousAmount}
+                  readOnly
+                  disabled
+                  placeholder="0.00"
+                  className="block w-full sm:w-48 px-4 py-3 sm:text-sm border border-stone-200 rounded-xl bg-stone-100 text-stone-500 cursor-not-allowed transition-all font-bold"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-stone-500 mb-2 uppercase tracking-wider">
+                  Outstanding Fine (g)
+                </label>
+                <input
+                  type="number"
+                  value={previousSilver}
+                  readOnly
+                  disabled
+                  placeholder="0.000"
+                  className="block w-full sm:w-48 px-4 py-3 sm:text-sm border border-stone-200 rounded-xl bg-stone-100 text-stone-500 cursor-not-allowed transition-all font-bold"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end gap-4 mt-8">
@@ -710,7 +783,7 @@ export default function AddManufacturerBillPage() {
           </div>
         ) : filteredBills.length === 0 ? (
           <div className="text-center py-12 bg-stone-50/50 rounded-xl border border-dashed border-stone-200">
-            <Receipt className="w-10 h-10 text-stone-300 mx-auto mb-2" />
+            <IndianRupee className="w-10 h-10 text-stone-300 mx-auto mb-2" />
             <p className="text-sm font-medium text-stone-500">No manufacturer bills found</p>
           </div>
         ) : (

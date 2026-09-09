@@ -1047,19 +1047,21 @@ export default function CreateBillPage() {
                   <span className="hidden sm:inline">Add Party</span>
                   <span className="sm:hidden">Add</span>
                 </button>
-                <button
-                  onClick={() => {
-                    setFormPartyName("");
-                    setFormMobileNumber("");
-                    setFormAddress("");
-                    setPreviousAmount("");
-                    setPreviousSilver("");
-                  }}
-                  className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Clear Party Details"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                {formPartyName && (
+                  <button
+                    onClick={() => {
+                      setFormPartyName("");
+                      setFormMobileNumber("");
+                      setFormAddress("");
+                      setPreviousAmount("");
+                      setPreviousSilver("");
+                    }}
+                    className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Clear Party Details"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -1147,10 +1149,21 @@ export default function CreateBillPage() {
                   <input type="radio" name="itemLanguage" value="english" checked={itemLanguage === "english"} onChange={() => setItemLanguage("english")} className="text-amber-500 focus:ring-amber-500" />
                   <span className="text-sm font-medium text-stone-700">English</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer mr-4">
                   <input type="radio" name="itemLanguage" value="gujarati" checked={itemLanguage === "gujarati"} onChange={() => setItemLanguage("gujarati")} className="text-amber-500 focus:ring-amber-500" />
                   <span className="text-sm font-medium text-stone-700">Gujarati</span>
                 </label>
+                <button
+                  onClick={() => {
+                    setIsManageModalOpen(true);
+                    setManageModalView("bill");
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Items</span>
+                  <span className="sm:hidden">Add</span>
+                </button>
               </div>
             </div>
             <div className="w-full pb-8 sm:pb-48">
@@ -1223,11 +1236,11 @@ export default function CreateBillPage() {
                   <button
                     id="btnAddItem"
                     onClick={handleAddItem}
-                    className="h-[38px] flex-1 lg:w-10 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
+                    className="h-[38px] flex-1 lg:flex-none lg:px-3.5 inline-flex items-center justify-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-sm font-semibold transition-colors"
                     title="Add Item"
                   >
-                    <span className="lg:hidden mr-2 font-medium">Add Item</span>
-                    <Plus className="h-5 w-5" />
+                    <Plus className="w-4 h-4" />
+                    <span className="font-medium">Add Item</span>
                   </button>
                   <button
                     onClick={clearItemInputs}
